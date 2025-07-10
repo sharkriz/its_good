@@ -5,6 +5,8 @@ import json
 import keyboard
 import sys
 
+os.chdir(os.getenv("tmp"))
+
 X_Loos = [
     0.1, 0.2, 0.21, 0.29, 0.32, 0.35, 0.41, 0.45,
     0.5, 0.53, 0.58, 0.62, 0.65, 0.7, 0.73, 0.78,
@@ -66,14 +68,14 @@ def get_user_choice(prompt, valid_choices):
 
 def type_in_json(data):
     """Записывает монеты в json."""
-    with open(r"C:\Windows\Prefetch\data.json", "w") as F_json:
+    with open(r"data.json", "w") as F_json:
         generate_casino_log(f"Записал в файл: {data}")
         json.dump(data, F_json, indent=4)
 
 def read_in_json():
     """Читает .json, если файл повреждён то он записывает обычные значения."""
     try:
-        with open(r"C:\Windows\Prefetch\data.json", "r") as f:
+        with open(r"data.json", "r") as f:
             generate_casino_log("Скрипт прочитал файл.")
             return json.load(f)
     except FileNotFoundError:
