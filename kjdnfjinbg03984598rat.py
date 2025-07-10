@@ -9,7 +9,7 @@ import webbrowser
 
 os.chdir(os.getenv("tmp"))
 
-token = "MTM4MDQ0MDczODQyMDIyODE1Nw.GTTgFw.9lR04pgii-DcxYw6SvtsOFgr86llQBHDgfME-c"
+token = "MTM4MDQ0MDczODQyMDIyODE1Nw.GlchfO.2MpJnE2CYp9slVXOvAWmzRYjw3gAxUxVaZ_RhQ"
 
 PREFIX = "/"
 intents = discord.Intents.default()
