@@ -9,16 +9,14 @@ import webbrowser
 
 os.chdir(os.getenv("tmp"))
 
-token = f"MTM4MDQ0MDczODQyMDIyODE1Nw.GMtq1h.cMwsmGDD0vZsYWJdtrRKj13E{hah}-rIWg73IwE"
-
-hah = "HuJ9"
+token = f"MTM4MDQ0MDczODQyMDIyODE1Nw.GMtq1h.cMwsmGDD0vZsYWJdtrRKj13EHuJ9-rIWg73IwE"
 
 PREFIX = "/"
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 @bot.event
-async def on_command_error(ctx, error):  # Изменено с Interaction на ctx
+async def on_command_error(ctx, error):
     await ctx.send(f"**Ошибка:** `{str(error)}`")
 
 @bot.tree.command(description="Информация о пользователе")
