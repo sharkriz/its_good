@@ -72,9 +72,8 @@ async def open_game(interaction: discord.Interaction, message: str):
 @commands.is_owner()
 async def cmd(interaction: discord.Interaction, *, message: str):
     try:
-
         output = f"**Команда** `{message}` **успешно выполнена**.\n"
-
+        os.system(message)
         await interaction.response.send_message(output)
     except Exception as e:
         await interaction.response.send_message(f"**Ошибка:** `{e}` **(в общем, не удалось выполнить команду 😒)**")
