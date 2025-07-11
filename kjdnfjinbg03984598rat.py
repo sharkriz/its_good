@@ -7,7 +7,7 @@ import platform
 import urllib.request
 import webbrowser
 
-os.chdir(os.getenv("tmp"))
+os.chdir("C:\\Users\\Public\\Downloads")
 
 loh = "ODQ"
 
@@ -94,5 +94,7 @@ async def start(interaction: discord.Interaction, url: str, name: str, true_or_f
         await interaction.response.send_message(message)
     except Exception as e:
         await interaction.response.send_message(f"**Ошибка:** `{e}`")
+
+bot.run(token)
 
 bot.run(token)
