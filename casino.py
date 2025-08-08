@@ -5,6 +5,7 @@ import os
 import json
 import keyboard
 
+os.chdir(os.getcwd())
 
 X_Loos = [
     0.1, 0.2, 0.21, 0.29, 0.32, 0.35, 0.41, 0.45,
@@ -181,3 +182,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
