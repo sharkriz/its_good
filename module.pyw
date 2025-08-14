@@ -1,5 +1,6 @@
 import os
 
 
-os.system("pip install keyboard, tkinter")
+os.system("pip install keyboard tk")
+
 
